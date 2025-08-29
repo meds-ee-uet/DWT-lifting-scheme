@@ -27,9 +27,10 @@ Wavelet transforms provide a **compact, multiresolution representation** of sign
 
 - **STFT (Short-Time Fourier Transform):** Uses fixed windows → poor adaptability  
 - **Wavelets:** Adaptive resolution → good time resolution at high frequencies, good frequency resolution at low frequencies  
-![Alt text](../images/ft_example.PNG)
-![Alt text](../images/stft_example.PNG)
-![Alt text](../images/wavelet_example.PNG)
+![Fourier Transform](../images/ft_example.PNG)
+![STFT](../images/stft_example.PNG)
+![Wavelet Transform](../images/wavelet_example.PNG)
+
 The **lifting scheme** decomposes DWT into steps:  
 - Split  
 - Predict  
