@@ -23,17 +23,16 @@ $$
 
 
 - **High-pass filter (HPF):**  
-  \[
+  $$
   g[n] = [-\frac{1}{2}, 1, -\frac{1}{2}]
-  \]
+  $$
 
 DWT convolution formulas:
 
-\[
+$$
 a[n] = \sum_k x[k] \cdot h[2n-k], \quad
 d[n] = \sum_k x[k] \cdot g[2n-k]
-\]
-
+$$
 ---
 
 ## 2. 5/3 Lifting Scheme
