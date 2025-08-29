@@ -168,17 +168,16 @@ $$
 **Step 3a: Substitute `d[n]` and `d[n-1]` into `a[n]`**
 
 $$
-\begin{aligned}
-a[n] &= x_e[n] + \tfrac{1}{4} \cdot \Big(
-(x_o[n-1] - \tfrac{1}{2} \cdot (x_e[n-1] + x_e[n])) +
-(x_o[n] - \tfrac{1}{2} \cdot (x_e[n] + x_e[n+1]))
-\Big) \\
-&= -\tfrac{1}{8} \cdot x_e[n-1]
-+ \tfrac{1}{4} \cdot x_o[n-1]
-+ \tfrac{3}{4} \cdot x_e[n]
-+ \tfrac{1}{4} \cdot x_o[n]
-- \tfrac{1}{8} \cdot x_e[n+1]
-\end{aligned}
+a[n] = x_e[n] + \tfrac{1}{4}\Big(
+(x_o[n-1] - \tfrac{1}{2}(x_e[n-1] + x_e[n])) +
+(x_o[n] - \tfrac{1}{2}(x_e[n] + x_e[n+1]))
+\Big)
+$$
+
+$$
+a[n] = -\tfrac{1}{8}x_e[n-1] + \tfrac{1}{4}x_o[n-1]
+       + \tfrac{3}{4}x_e[n]   + \tfrac{1}{4}x_o[n]
+       - \tfrac{1}{8}x_e[n+1]
 $$
 
 This exactly matches the **LPF convolution coefficients**:
