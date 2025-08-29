@@ -231,14 +231,14 @@ a(2) → {a(3), d(3)}
 - Input: **16-bit stream**  
 - Output: **7 detail coefficients + 1 approximation coefficient**  
 
-![Figure 7: Top-level DWT Module](figure6.png)  
+![Figure 7: Top-level DWT Module](images/top_level_doc.PNG)  
 
 ---
 ### V. STATE TRANSISTION DIAGRAM
 
 The FSM cycles through **data input → residual processing → next level**, repeating until the third level completes. The `count` and `valid_in` signals govern transitions, ensuring synchronization with input streaming and intermediate coefficient availability.
 
-*(Insert State Transition Diagram here)*  
+![Figure 8: State Diagram](images/controller1.jpg)  
 
 This FSM guarantees that the three-level decomposition is performed sequentially with precise timing control, preventing data hazards.
 
