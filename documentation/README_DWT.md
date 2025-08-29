@@ -344,7 +344,7 @@ Simulations performed in **QuestaSim** using **SystemVerilog testbenches**.
 | Level-3 latency          | 6 cycles   |
 | **Total pipeline latency** | **25 cycles** |
 
-![Figure 7: Simulation Waveform](figure7.png)  
+![Figure 7: Simulation Waveform](images/Simulation.jpg)  
 
 ---
 
