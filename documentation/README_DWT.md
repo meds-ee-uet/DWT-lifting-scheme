@@ -80,7 +80,6 @@ The **Discrete Wavelet Transform (DWT)** decomposes a signal `x[n]` into **appro
   - **Low-pass filter (LPF):** extracts the **approximation coefficients** `a[n]` (captures the low-frequency content).  
   - **High-pass filter (HPF):** extracts the **detail coefficients** `d[n]` (captures the high-frequency content).  
 - After filtering, **downsampling by 2** is applied to reduce the number of samples by half.
-
 Mathematically:
 
 $$
@@ -100,12 +99,9 @@ $$
 Where `h'` and `g'` are the **synthesis filters** corresponding to the LPF and HPF.
 
 ---
-
-                   ![Alt text](images/high_low_pass_downsampling.png)
+![Alt text](images/high_low_pass_downsampling.png)
  
-
 ---
-
 
 ### Implementation Methods
 
