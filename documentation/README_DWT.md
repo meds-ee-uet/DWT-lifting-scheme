@@ -210,7 +210,7 @@ x[n] → {a(1), d(1)}
 a(1) → {a(2), d(2)}
 a(2) → {a(3), d(3)}
 
-![Figure 5: 3-Level Recursion Tree](images/level_doc.jpg)  
+![Figure 5: 3-Level Recursion Tree](images/level_doc.JPG)  
 
 ---
 
@@ -334,6 +334,7 @@ Simulations performed in **QuestaSim** using **SystemVerilog testbenches**.
 
 - Hardware results matched MATLAB reference outputs  
 - Confirmed correctness and low latency  
+![Figure 7: Simulation Waveform](images/Simulation.jpg)
 
 ### Representative Metrics  
 
@@ -344,7 +345,7 @@ Simulations performed in **QuestaSim** using **SystemVerilog testbenches**.
 | Level-3 latency          | 6 cycles   |
 | **Total pipeline latency** | **25 cycles** |
 
-![Figure 7: Simulation Waveform](images/Simulation.jpg)  
+
 
 ---
 
