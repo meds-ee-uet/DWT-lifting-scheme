@@ -15,9 +15,12 @@ The **5/3 wavelet** can be implemented using either **convolution filters** or t
 The 5/3 wavelet convolution filters are:
 
 - **Low-pass filter (LPF):**  
-  \[
-  h[n] = [-\frac{1}{8}, \frac{1}{4}, \frac{3}{4}, \frac{1}{4}, -\frac{1}{8}]
-  \]
+Low-pass filter (LPF):
+
+$$
+h[n] = \left[-\frac{1}{8}, \frac{1}{4}, \frac{3}{4}, \frac{1}{4}, -\frac{1}{8}\right]
+$$
+
 
 - **High-pass filter (HPF):**  
   \[
