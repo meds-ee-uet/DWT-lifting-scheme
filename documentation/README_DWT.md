@@ -13,7 +13,8 @@ The **5/3 wavelet** can be implemented using either **convolution filters** or t
 ---
 
 ## 1. Convolution-based DWT
-
+```math
+h[n] = \left[ -\tfrac{1}{8}, \tfrac{1}{4}, \tfrac{3}{4}, \tfrac{1}{4}, -\tfrac{1}{8} \right]
 The 5/3 wavelet convolution filters are:
 
 **Low-pass filter (LPF):**
