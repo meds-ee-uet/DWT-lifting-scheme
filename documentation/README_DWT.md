@@ -99,7 +99,9 @@ $$
 
 Where `h'` and `g'` are the **synthesis filters** corresponding to the LPF and HPF.
 
- ![Alt text](images/high_low_pass_downsampling.png)
+---
+
+                   ![Alt text](images/high_low_pass_downsampling.png)
  
 
 ---
