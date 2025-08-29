@@ -27,17 +27,13 @@ Wavelet transforms provide a **compact, multiresolution representation** of sign
 
 - **STFT (Short-Time Fourier Transform):** Uses fixed windows → poor adaptability  
 - **Wavelets:** Adaptive resolution → good time resolution at high frequencies, good frequency resolution at low frequencies  
-![Fourier Transform](images/ft_example.PNG)
-![STFT](images/stft_example.PNG)
-![Wavelet Transform](images/wavelet_example.PNG)
-
  
 The **lifting scheme** decomposes DWT into steps:  
 - Split  
 - Predict  
 - Update  
 
-For **integer-to-integer transforms** (e.g., LeGall 5/3), lifting requires only additions, subtractions, and shifts → ideal for **FPGA/ASIC**.  
+For **integer-to-integer transforms** (LeGall 5/3 wavelet), lifting requires only additions, subtractions, and shifts → ideal for **FPGA/ASIC**.  
 
 **Contributions of this work:**  
 - Detailed explanation of DWT (with 5/3 lifting)  
@@ -66,11 +62,10 @@ For compression:
 - **FFT:** Efficient FT, same limitation  
 - **STFT:** Localizes frequency but uses fixed window → tradeoff  
 - **Wavelets:** Multi-resolution, localized in both time and frequency  
-
-![Figure 1: FT and FFT](C:\Users\A\Desktop\ft_example.PNG)  
-![Figure 2: STFT Windowing](figure2.png)  
-![Figure 3: Wavelet Transform](figure3.png)  
-
+![Fourier Transform](images/ft_example.PNG)
+![STFT](images/stft_example.PNG)
+![Wavelet Transform](images/wavelet_example.PNG)
+ 
 ---
 
 ### B. Wavelet Theory Essentials  
