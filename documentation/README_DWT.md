@@ -1,0 +1,278 @@
+# Design and Implementation of 3-level Discrete Wavelet Transform (DWT) using Lifting Scheme  
+
+## Abstract  
+This project presents a **3-level one-dimensional (1D) Discrete Wavelet Transform (DWT)** architecture implemented using the **lifting scheme** in SystemVerilog. It is designed for **eight 16-bit input samples**, although it can be scaled for different word lengths and sample sizes.  
+
+The lifting scheme is chosen for its **computational efficiency** and **hardware-friendly nature**, allowing in-place calculations with reduced memory usage compared to traditional convolution-based DWT.  
+
+The architecture is optimized for:  
+- Efficient resource utilization  
+- Modular design  
+- Low-latency operation  
+
+It consists of clearly defined functional blocks:  
+- Predictor and update modules  
+- FIFO buffers  
+- Multiplexers  
+- Controller (FSM)  
+
+**Target Applications:** Real-time signal processing, compression, biomedical signal analysis, and embedded sensing.  
+
+Validation is performed using **self-checking SystemVerilog testbenches**, comparing hardware-generated coefficients against MATLAB references. Simulation results demonstrate accurate multi-level decomposition and clear separation of approximation and detail coefficients.  
+
+---
+
+## I. Introduction  
+Wavelet transforms provide a **compact, multiresolution representation** of signals, capturing both **time and frequency** information.  
+
+- **STFT (Short-Time Fourier Transform):** Uses fixed windows → poor adaptability  
+- **Wavelets:** Adaptive resolution → good time resolution at high frequencies, good frequency resolution at low frequencies  
+
+The **lifting scheme** decomposes DWT into steps:  
+- Split  
+- Predict  
+- Update  
+
+For **integer-to-integer transforms** (e.g., LeGall 5/3), lifting requires only additions, subtractions, and shifts → ideal for **FPGA/ASIC**.  
+
+**Contributions of this work:**  
+- Detailed explanation of DWT (with 5/3 lifting)  
+- Floating-point and integer equations  
+- Modular SystemVerilog design (predictor, updater, FIFOs, controller)  
+
+---
+
+## II. Coarse and Detail Coefficients  
+A single-level DWT splits the signal:  
+
+- **Approximation (a[n])**: low-pass, coarse features  
+- **Detail (d[n])**: high-pass, sharp changes, edges  
+
+These allow **exact reconstruction** with inverse DWT.  
+
+For compression:  
+- Many detail coefficients are near-zero → aggressive quantization possible.  
+
+---
+
+## III. Background  
+
+### A. From FT to Wavelets  
+- **Fourier Transform (FT):** Frequency only, no time localization  
+- **FFT:** Efficient FT, same limitation  
+- **STFT:** Localizes frequency but uses fixed window → tradeoff  
+- **Wavelets:** Multi-resolution, localized in both time and frequency  
+
+![Figure 1: FT and FFT](C:\Users\A\Desktop\ft_example.PNG)  
+![Figure 2: STFT Windowing](figure2.png)  
+![Figure 3: Wavelet Transform](figure3.png)  
+
+---
+
+### B. Wavelet Theory Essentials  
+DWT decomposes signal `x[n]` into approximation and detail coefficients using:  
+- **Analysis filters + downsampling**  
+- **Synthesis filters + upsampling**  
+
+---
+
+### C. DWT (5/3) Lifting Scheme  
+
+**Steps:**  
+1. Split: Separate even and odd samples  
+2. Predict: Use even samples to predict odd → detail `d[i]`  
+3. Update: Use details to update even → approximation `a[i]`  
+
+**Floating-point equations (5/3):**  
+
+$$
+d_i = o_i - \frac{(e_i + e_{i+1})}{2}
+$$  
+
+$$
+a_i = e_i + \frac{(d_i + d_{i+1})}{4}
+$$  
+
+**Integer equations (hardware-friendly):**  
+
+$$
+d_i = \lfloor o_i - 0.5 e_i - 0.5 e_{i+1} \rfloor
+$$  
+
+$$
+a_i = e_i + \lfloor 0.25 d_i + 0.25 d_{i+1} \rfloor
+$$  
+
+---
+
+### D. Multi-level Decomposition  
+
+Recursion:  
+x[n] → {a(1), d(1)}
+a(1) → {a(2), d(2)}
+a(2) → {a(3), d(3)}
+
+![Figure 5: 3-Level Recursion Tree](figure5.png)  
+---
+
+## IV. Architecture Overview  
+
+### Modules  
+- **Predictor** → computes `d[i]`  
+- **Update** → computes `a[i]`  
+- **FIFO Buffers** → align sample timing  
+- **MUX** → selects input stream  
+- **Registers (D1–D4)** → intermediate storage  
+- **Controller (FSM)** → manages sequencing  
+
+![Figure 6: Architectural Overview](figure5.png)  
+
+### Top-level Integration  
+- Unified design integrates all modules  
+- Input: **16-bit stream**  
+- Output: **7 detail coefficients + 1 approximation coefficient**  
+
+![Figure 7: Top-level DWT Module](figure6.png)  
+
+---
+### V. STATE TRANSISTION DIAGRAM
+
+The FSM cycles through **data input → residual processing → next level**, repeating until the third level completes. The `count` and `valid_in` signals govern transitions, ensuring synchronization with input streaming and intermediate coefficient availability.
+
+*(Insert State Transition Diagram here)*  
+
+This FSM guarantees that the three-level decomposition is performed sequentially with precise timing control, preventing data hazards.
+
+---
+### VI. CONTROLLER DESIGN
+
+The architecture employs **two controllers** to manage sequencing, synchronization, and data flow across the lifting-based DWT pipeline. Both controllers are FSM-driven and ensure correct operation of predictor, updater, and memory buffers.
+
+#### A. Controller 1: Level Sequencing FSM
+Controller1 is responsible for sequencing the three decomposition levels of the DWT. It is modeled as a **finite state machine (FSM)** with the following states:
+
+- **IDLE**: System waits for `valid_in` signal.  
+- **DATA_IN_PHASE1, DATA_IN_PHASE2, DATA_IN_PHASE3**: Each state handles the streaming of input samples for the respective decomposition level.  
+- **RESIDUAL_PROCESSING1, RESIDUAL_PROCESSING2, RESIDUAL_PROCESSING3**: Each state processes the residual approximation coefficients and prepares them for the next level.  
+
+**Outputs:**  
+- `count_en`: Enables counter for sample sequencing.  
+- `data_sel`: Selects between raw input samples and coarse coefficients.  
+- `internal_valid`: Indicates validity of intermediate results.  
+- `coarse_coeff_rd_en`: Enables reading of coarse coefficients for the next level.  
+- `level_done`: Signals completion of each decomposition level.  
+
+#### Table 1. Look-up table of controller 1
+| count | valid_in | count_enable | data_sel | internal_valid | coarse_coeff_rd_en | level_done |
+|-------|----------|--------------|----------|----------------|--------------------|------------|
+| x  | 1 | 1 | 0 | 0 | 0 | 0 |
+| x  | 0 | 0 | 0 | 0 | 0 | 0 |
+|<=7 | 1 | 1 | 0 | 0 | 0 | 0 |
+| >7 | 0 | 1 | 1 | 0 | 0 | 0 |
+|<=10| 0 | 1 | 1 | 0 | 0 | 0 |
+|>10 | 0 | 1 | 1 | 1 | 1 | 1 |
+|<=15| 0 | 1 | 1 | 1 | 1 | 0 |
+|>15 | 0 | 1 | 1 | 0 | 0 | 0 |
+|<=18| 0 | 1 | 1 | 0 | 0 | 0 |
+|>18 | 0 | 1 | 1 | 1 | 1 | 1 |
+|<=21| 0 | 1 | 1 | 1 | 1 | 0 |
+|>21 | 0 | 1 | 1 | 0 | 0 | 0 |
+|>24 | 0 | 1 | 0 | 0 | 0 | 1 |
+
+
+#### B. Controller 2: Output Validation and Memory Control
+Controller2 governs the generation and validation of **detail** and **coarse** coefficients. Unlike Controller1, which focuses on level management, Controller2 directly controls data-path signals:
+
+- **`valid_detailOut`**: Asserts when detail coefficients are ready.  
+- **`valid_coarseOut`**: Asserts when coarse coefficients are ready.  
+- **`coarse_coeff_wr_en`**: Enables storage of coarse coefficients into FIFO/memory.  
+- **`even_rd_en`, `even_wr_en`**: Manage reading and writing of even samples for predictor and updater.  
+- **`iseven`**: Identifies whether the current sample index is even, simplifying lifting operations.  
+
+Controller2 uses a **counter-based case structure** to schedule coefficient outputs at specific cycles (e.g., `count = 4, 6, 8 …` for coarse and detail outputs). It also maintains an internal counter (`my_sample_count`) that resets after every 8 input samples or 4 internally generated samples, ensuring proper framing.
+
+This controller thus ensures **synchronized coefficient generation, memory writes, and predictor/updater access**, complementing the higher-level sequencing managed by Controller1.
+
+#### Table 2. Look-up table of controller 2
+| count | valid_detail_out | valid_coarse_out | coarse_coeff_wr_en | even_rd_en |
+|-------|------------------|------------------|--------------------|------------|
+| 2  | 1 | 0 | 0 | 1 |
+| 3  | 1 | 1 | 1 | 1 | 
+| 4  | 1 | 1 | 1 | 1 | 
+| 5  | 0 | 0 | 0 | 0 | 
+| 6  | 1 | 1 | 1 | 1 |
+| 7  | 0 | 0 | 0 | 0 | 
+| 8  | 1 | 1 | 1 | 1 |
+| 9  | 0 | 0 | 0 | 0 | 
+| 10 | 0 | 1 | 1 | 1 |
+| 11 | 0 | 0 | 0 | 0 | 
+| 12 | 0 | 0 | 0 | 0 | 
+| 13 | 0 | 0 | 0 | 0 |
+| 14 | 1 | 0 | 0 | 1 |
+| 15 | 0 | 0 | 0 | 0 | 
+| 16 | 1 | 1 | 1 | 1 |
+| 17 | 0 | 0 | 0 | 0 | 
+| 18 | 0 | 1 | 1 | 0 | 
+| 19 | 0 | 0 | 0 | 0 |
+| 20 | 0 | 0 | 0 | 0 | 
+| 21 | 0 | 0 | 0 | 0 |
+| 22 | 1 | 0 | 0 | 1 |
+| 23 | 0 | 0 | 0 | 0 | 
+| 24 | 0 | 0 | 0 | 0 |
+| 25 | 0 | 0 | 0 | 0 |
+
+
+#### C. Combined Control Operation
+Together, the two controllers ensure:  
+1. **Multi-level sequencing (Controller1).**  
+2. **Precise coefficient validation and memory synchronization (Controller2).**  
+
+This separation of concerns enables modularity: Controller1 focuses on **when to process**, while Controller2 focuses on **what to output and store**. Such modular FSM-based design improves reusability and simplifies debugging in FPGA/ASIC environments.
+
+## VII. Simulation and Validation  
+
+Simulations performed in **QuestaSim** using **SystemVerilog testbenches**.  
+
+- Hardware results matched MATLAB reference outputs  
+- Confirmed correctness and low latency  
+
+### Representative Metrics  
+
+| Metric                  | Value      |
+|--------------------------|------------|
+| Level-1 latency          | 11 cycles  |
+| Level-2 latency          | 8 cycles   |
+| Level-3 latency          | 6 cycles   |
+| **Total pipeline latency** | **25 cycles** |
+
+![Figure 7: Simulation Waveform](figure7.png)  
+
+---
+
+## VI. Conclusion  
+The presented **3-level 1D DWT architecture** (LeGall 5/3 lifting):  
+- Compact, modular, and hardware-friendly  
+- Bit-exact integer reconstruction (lossless)  
+- Real-time applicability:  
+  - JPEG2000  
+  - Video coding  
+  - Biomedical signal analysis  
+  - Embedded sensing  
+
+---
+
+## Acknowledgment  
+The authors thank their **advisor** and **MEDS Research Lab** for their support and discussions.  
+
+---
+
+## References  
+1. I. Daubechies, *Ten Lectures on Wavelets*, SIAM, 1992.  
+2. W. Sweldens, *The Lifting Scheme: A Construction of Second Generation Wavelets*, SIAM J. Math. Analysis, 1996.  
+3. S. Mallat, *A Wavelet Tour of Signal Processing*, 3rd ed., Academic Press, 2008.  
+4. ISO/IEC 15444-1:2000, *JPEG 2000 Core Coding System*.  
+5. A. Le Gall, W. Meyer, *Low complexity reversible integer wavelet transform for lossless image compression*, IEEE Trans. Image Processing.  
+6. IEEE 1800-2017, *SystemVerilog Standard*.  
+7. Recent FPGA DWT implementations (refer to journals/conference papers).  
+
+
