@@ -99,6 +99,7 @@ $$
 Where `h'` and `g'` are the **synthesis filters** corresponding to the LPF and HPF.
 
 ---
+### Three-Level DWT Decomposition with Low-Pass (h[n]) and High-Pass (g[n]) Filters
 ![Alt text](images/high_low_pass_downsampling.png)
  
 ---
