@@ -104,6 +104,37 @@ Where `h'` and `g'` are the **synthesis filters** corresponding to the LPF and H
 
 ---
 
+
+### Implementation Methods
+
+The **5/3 wavelet** can be implemented using either **convolution filters** or the **lifting scheme**. Although the algorithms look different, they are **mathematically equivalent** ,lifting scheme is computationaly low.
+
+---
+
+## 1. Convolution-based DWT
+
+The 5/3 wavelet convolution filters are:
+
+**Low-pass filter (LPF):**
+
+$$
+h[n] = [-\tfrac{1}{8}, \tfrac{1}{4}, \tfrac{3}{4}, \tfrac{1}{4}, -\tfrac{1}{8}]
+$$
+
+**High-pass filter (HPF):**
+
+$$
+g[n] = [-\tfrac{1}{2}, 1, -\tfrac{1}{2}]
+$$
+
+DWT convolution formulas:
+
+$$
+a[n] = \sum_k x[k] \cdot h[2n - k], \quad
+d[n] = \sum_k x[k] \cdot g[2n - k]
+$$
+
+---
 ### C. DWT (5/3) Lifting Scheme  
 
 **Steps:**  
@@ -111,27 +142,65 @@ Where `h'` and `g'` are the **synthesis filters** corresponding to the LPF and H
 2. Predict: Use even samples to predict odd → detail `d[i]`  
 3. Update: Use details to update even → approximation `a[i]`  
 
-**Floating-point equations (5/3):**  
+**Step 1: Split even and odd samples**
 
 $$
-d_i = o_i - \frac{(e_i + e_{i+1})}{2}
-$$  
+x_e[n] = x[2n], \quad x_o[n] = x[2n+1]
+$$
+
+**Step 2: Predict step (detail coefficients)**
 
 $$
-a_i = e_i + \frac{(d_i + d_{i+1})}{4}
-$$  
+d[n] = x_o[n] - \tfrac{1}{2} \cdot (x_e[n] + x_e[n+1])
+$$
 
-**Integer equations (hardware-friendly):**  
+**Step 3: Update step (approximation coefficients)**
 
 $$
-d_i = \lfloor o_i - 0.5 e_i - 0.5 e_{i+1} \rfloor
-$$  
-
+a[n] = x_e[n] + \tfrac{1}{4} \cdot (d[n-1] + d[n])
 $$
-a_i = e_i + \lfloor 0.25 d_i + 0.25 d_{i+1} \rfloor
-$$  
 
 ---
+
+## 3. Expand Lifting Steps to Original Signal 
+
+
+**Step 3a: Substitute `d[n]` and `d[n-1]` into `a[n]`**
+
+$$
+\begin{aligned}
+a[n] &= x_e[n] + \tfrac{1}{4} \cdot \Big(
+(x_o[n-1] - \tfrac{1}{2} \cdot (x_e[n-1] + x_e[n])) +
+(x_o[n] - \tfrac{1}{2} \cdot (x_e[n] + x_e[n+1]))
+\Big) \\
+&= -\tfrac{1}{8} \cdot x_e[n-1]
++ \tfrac{1}{4} \cdot x_o[n-1]
++ \tfrac{3}{4} \cdot x_e[n]
++ \tfrac{1}{4} \cdot x_o[n]
+- \tfrac{1}{8} \cdot x_e[n+1]
+\end{aligned}
+$$
+
+This exactly matches the **LPF convolution coefficients**:
+
+$$
+h[n] = [-\tfrac{1}{8}, \tfrac{1}{4}, \tfrac{3}{4}, \tfrac{1}{4}, -\tfrac{1}{8}]
+$$
+
+---
+
+**Step 3b: Detail coefficients**
+
+$$
+d[n] = x_o[n] - \tfrac{1}{2} \cdot (x_e[n] + x_e[n+1])
+= -\tfrac{1}{2} \cdot x_e[n] + x_o[n] - \tfrac{1}{2} \cdot x_e[n+1]
+$$
+
+This matches the **HPF convolution coefficients**:
+
+$$
+g[n] = [-\tfrac{1}{2}, 1, -\tfrac{1}{2}]
+$$
 
 ### D. Multi-level Decomposition  
 
