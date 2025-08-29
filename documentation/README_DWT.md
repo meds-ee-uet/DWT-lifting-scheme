@@ -106,7 +106,7 @@ Where `h'` and `g'` are the **synthesis filters** corresponding to the LPF and H
 
 ### Implementation Methods
 
-The **5/3 wavelet** can be implemented using either **convolution filters** or the **lifting scheme**. Although the algorithms look different, they are **mathematically equivalent** ,lifting scheme is computationaly low.
+The **5/3 wavelet** can be implemented using either **convolution filters** or the **lifting scheme**. Although the algorithms look different, they are **mathematically equivalent** ,the lifting scheme is computationally efficient.
 
 ---
 
