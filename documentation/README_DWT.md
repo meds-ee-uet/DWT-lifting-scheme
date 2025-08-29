@@ -69,10 +69,35 @@ For compression:
 ---
 
 ### B. Wavelet Theory Essentials  
-DWT decomposes signal `x[n]` into approximation and detail coefficients using:  
-- **Analysis filters + downsampling**  
-- **Synthesis filters + upsampling**  
+# B. Wavelet Theory Essentials
 
+The **Discrete Wavelet Transform (DWT)** decomposes a signal `x[n]` into **approximation** and **detail coefficients** using **filtering and downsampling**.
+
+## 1. Analysis (Decomposition) Stage
+- The signal is passed through **two analysis filters**:
+  - **Low-pass filter (LPF):** extracts the **approximation coefficients** `a[n]` (captures the low-frequency content).  
+  - **High-pass filter (HPF):** extracts the **detail coefficients** `d[n]` (captures the high-frequency content).  
+- After filtering, **downsampling by 2** is applied to reduce the number of samples by half.
+
+Mathematically:
+
+$$
+a[n] = \sum_k x[k] \cdot h[2n - k] \quad \text{(LPF + downsample)}
+$$
+$$
+d[n] = \sum_k x[k] \cdot g[2n - k] \quad \text{(HPF + downsample)}
+$$
+
+## 2. Synthesis (Reconstruction) Stage
+- To reconstruct the original signal, **upsampling by 2** is applied to both `a[n]` and `d[n]`, followed by **synthesis filters** (LPF and HPF) and summation:
+
+$$
+x[n] = \sum_k a[k] \cdot h'[n - 2k] + \sum_k d[k] \cdot g'[n - 2k]
+$$
+
+Where `h'` and `g'` are the **synthesis filters** corresponding to the LPF and HPF.
+
+ 
 ---
 
 ### C. DWT (5/3) Lifting Scheme  
