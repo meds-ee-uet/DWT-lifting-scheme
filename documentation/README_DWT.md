@@ -201,6 +201,8 @@ $$
 g[n] = [-\tfrac{1}{2}, 1, -\tfrac{1}{2}]
 $$
 
+---
+
 ### D. Multi-level Decomposition  
 
 Recursion:  
@@ -208,7 +210,8 @@ x[n] → {a(1), d(1)}
 a(1) → {a(2), d(2)}
 a(2) → {a(3), d(3)}
 
-![Figure 5: 3-Level Recursion Tree](figure5.png)  
+![Figure 5: 3-Level Recursion Tree](images/level_doc.jpg)  
+
 ---
 
 ## IV. Architecture Overview  
@@ -221,7 +224,7 @@ a(2) → {a(3), d(3)}
 - **Registers (D1–D4)** → intermediate storage  
 - **Controller (FSM)** → manages sequencing  
 
-![Figure 6: Architectural Overview](figure5.png)  
+![Figure 6: Architectural Overview](images/arch_doc.PNG)  
 
 ### Top-level Integration  
 - Unified design integrates all modules  
