@@ -9,89 +9,77 @@ The lifting scheme is chosen for its **computational efficiency** and **hardware
 The **5/3 wavelet** can be implemented using either **convolution filters** or the **lifting scheme**. Although the algorithms look different, they are **mathematically equivalent**.
 
 ---
+# Equivalence of 5/3 Lifting Scheme and Convolution DWT
+
+The **5/3 wavelet** can be implemented using either **convolution filters** or the **lifting scheme**. Although the algorithms look different, they are **mathematically equivalent**.
+
+---
 
 ## 1. Convolution-based DWT
 
 The 5/3 wavelet convolution filters are:
 
 - **Low-pass filter (LPF):**  
-Low-pass filter (LPF):
-
 $$
-h[n] = \left[-\frac{1}{8}, \frac{1}{4}, \frac{3}{4}, \frac{1}{4}, -\frac{1}{8}\right]
+h[n] = [-1/8, 1/4, 3/4, 1/4, -1/8]
 $$
-
 
 - **High-pass filter (HPF):**  
-  $$
-  g[n] = [-\frac{1}{2}, 1, -\frac{1}{2}]
-  $$
-
-DWT convolution formulas:
-
 $$
-a[n] = \sum_k x[k] \cdot h[2n-k], \quad
-d[n] = \sum_k x[k] \cdot g[2n-k]
+g[n] = [-1/2, 1, -1/2]
 $$
+
+DWT convolution formulas:  
+$$
+a[n] = \sum_k x[k] \cdot h[2n - k], \quad
+d[n] = \sum_k x[k] \cdot g[2n - k]
+$$
+
 ---
 
 ## 2. 5/3 Lifting Scheme
 
-**Step 1: Split even and odd samples**
-
-\[
+**Step 1: Split even and odd samples**  
+$$
 x_e[n] = x[2n], \quad x_o[n] = x[2n+1]
-\]
+$$
 
-**Step 2: Predict step (detail coefficients)**
+**Step 2: Predict step (detail coefficients)**  
+$$
+d[n] = x_o[n] - 1/2 \cdot (x_e[n] + x_e[n+1])
+$$
 
-\[
-d[n] = x_o[n] - \frac{1}{2}(x_e[n] + x_e[n+1])
-\]
-
-**Step 3: Update step (approximation coefficients)**
-
-\[
-a[n] = x_e[n] + \frac{1}{4}(d[n-1] + d[n])
-\]
+**Step 3: Update step (approximation coefficients)**  
+$$
+a[n] = x_e[n] + 1/4 \cdot (d[n-1] + d[n])
+$$
 
 ---
 
 ## 3. Expand Lifting Steps to Original Signal
 
-**Step 3a: Substitute `d[n]` and `d[n-1]` into `a[n]`**
-
-\[
+**Step 3a: Substitute `d[n]` and `d[n-1]` into `a[n]`**  
+$$
 \begin{aligned}
-a[n] &= x_e[n] + \frac{1}{4} \Big( (x_o[n-1] - \frac{x_e[n-1]+x_e[n]}{2}) + (x_o[n] - \frac{x_e[n]+x_e[n+1]}{2}) \Big) \\
-&= x_e[n] - \frac{1}{8} x_e[n-1] - \frac{1}{8} x_e[n+1] - \frac{1}{4} x_e[n] - \frac{1}{4} x_e[n] + \frac{1}{4} x_o[n-1] + \frac{1}{4} x_o[n] \\
-&= -\frac{1}{8} x_e[n-1] + \frac{1}{4} x_o[n-1] + \frac{3}{4} x_e[n] + \frac{1}{4} x_o[n] - \frac{1}{8} x_e[n+1]
+a[n] &= x_e[n] + 1/4 \cdot \Big( (x_o[n-1] - 1/2 \cdot (x_e[n-1] + x_e[n])) + (x_o[n] - 1/2 \cdot (x_e[n] + x_e[n+1])) \Big) \\
+&= -1/8 \cdot x_e[n-1] + 1/4 \cdot x_o[n-1] + 3/4 \cdot x_e[n] + 1/4 \cdot x_o[n] - 1/8 \cdot x_e[n+1]
 \end{aligned}
-\]
+$$
 
-- This exactly matches the **LPF convolution coefficients**:
+- This exactly matches the **LPF convolution coefficients**:  
+$$
+h[n] = [-1/8, 1/4, 3/4, 1/4, -1/8]
+$$
 
-\[
-h[n] = [-\frac{1}{8}, \frac{1}{4}, \frac{3}{4}, \frac{1}{4}, -\frac{1}{8}]
-\]
+**Step 3b: Detail coefficients**  
+$$
+d[n] = x_o[n] - 1/2 \cdot (x_e[n] + x_e[n+1]) = -1/2 \cdot x_e[n] + x_o[n] - 1/2 \cdot x_e[n+1]
+$$
 
-**Step 3b: Detail coefficients**
-
-\[
-d[n] = x_o[n] - \frac{1}{2}(x_e[n] + x_e[n+1])
-\]
-
-- Expanding in terms of the original signal gives:
-
-\[
-d[n] = -\frac{1}{2} x_e[n] + x_o[n] - \frac{1}{2} x_e[n+1]
-\]
-
-- This matches the **HPF convolution coefficients**:
-
-\[
-g[n] = [-\frac{1}{2}, 1, -\frac{1}{2}]
-\]
+- This matches the **HPF convolution coefficients**:  
+$$
+g[n] = [-1/2, 1, -1/2]
+$$
 
 ---
 
@@ -103,8 +91,6 @@ g[n] = [-\frac{1}{2}, 1, -\frac{1}{2}]
 - Every step is **linear**, so expanding all steps recovers the **original convolution sums** exactly.
 
 ---
-
-## 5. ASCII Diagram of Equivalence
 
 
 
