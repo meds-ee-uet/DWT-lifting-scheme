@@ -30,10 +30,7 @@ Wavelet transforms provide a **compact, multiresolution representation** of sign
 ![Fourier Transform](../images/ft_example.PNG)
 ![STFT](../images/stft_example.PNG)
 ![Wavelet Transform](../images/wavelet_example.PNG)
-![Fourier Transform](ft_example.PNG)
-![STFT](stft_example.PNG)
-![Wavelet Transform](wavelet_example.PNG)
-
+ 
 The **lifting scheme** decomposes DWT into steps:  
 - Split  
 - Predict  
